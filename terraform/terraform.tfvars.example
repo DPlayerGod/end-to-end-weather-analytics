@@ -1,0 +1,15 @@
+# ============================
+# Terraform Variables Example
+# ============================
+
+project_id = "your-gcp-project-id"
+region     = "asia-southeast1"
+location   = "ASIA-SOUTHEAST1"
+
+# Bucket prefix (random suffix will be added automatically)
+bucket_prefix = "your-weather-datalake"
+
+# BigQuery dataset names
+raw_dataset_id     = "weather_raw"
+staging_dataset_id = "weather_staging"
+marts_dataset_id   = "weather_marts"
