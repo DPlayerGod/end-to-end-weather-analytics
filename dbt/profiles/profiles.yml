@@ -1,0 +1,12 @@
+weather_project:
+  target: prod
+  outputs:
+    prod:
+      type: bigquery
+      method: service-account
+      project: kestra-486406
+      dataset: weather_raw
+      location: asia-southeast1
+      threads: 4
+      timeout_seconds: 300
+      keyfile: /app/gcp_sa.json
