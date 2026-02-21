@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: weather_raw
+    database: kestra-486406
+    schema: weather_raw
+    tables:
+      - name: openweather_current
+        description: "Raw OpenWeather current data"
+        loaded_at_field: api_call_time

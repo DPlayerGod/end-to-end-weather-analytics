@@ -1,0 +1,37 @@
+name: 'weather_project'
+version: '1.0.0'
+
+# Require a specific dbt version for reproducibility
+require-dbt-version: [">=1.7.0", "<2.0.0"]
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'weather_project'
+
+# These configurations specify where dbt should look for different types of files.
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Project-level variables
+vars:
+  # Date range for dev environment sampling
+  dev_start_date: '2026-02-20'
+  dev_end_date: '2026-02-21'
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+models:
+  weather_project:
+    +persist_docs:
+      relation: true
+      columns: true
+    staging:
+      +schema: weather_staging
+      +materialized: view
+    marts:
+      +schema: weather_marts
+      +materialized: table

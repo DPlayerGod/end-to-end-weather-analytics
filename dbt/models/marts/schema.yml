@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: mart_city_hourly
+    description: "Hourly aggregated weather metrics per city."
+    columns:
+      - name: event_hour
+        description: "Hour-level timestamp of weather observation."
+      - name: avg_temp_c
+        description: "Average hourly temperature in Celsius."
+      - name: avg_heat_index_c
+        description: "Average hourly heat index in Celsius."
+      - name: heat_category
+        description: "Heat risk classification based on average heat index."
+
+  - name: mart_city_latest
+    description: "Latest weather observation per city."
+    columns:
+      - name: event_time
+        description: "Most recent observation timestamp."
+      - name: heat_index_c
+        description: "Current heat index."
+      - name: heat_category
+        description: "Current heat risk classification."

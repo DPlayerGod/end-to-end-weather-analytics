@@ -1,0 +1,91 @@
+version: 2
+
+models:
+  - name: stg_openweather_current
+    description: "Cleaned and standardized weather observation data from OpenWeather API (raw bronze layer)."
+    columns:
+
+      - name: city
+        description: "City name where the weather observation was recorded."
+        tests: [not_null]
+
+      - name: country
+        description: "ISO country code of the city."
+        tests: [not_null]
+
+      - name: lon
+        description: "Longitude coordinate of the city (decimal degrees)."
+
+      - name: lat
+        description: "Latitude coordinate of the city (decimal degrees)."
+
+      - name: temp_c
+        description: "Air temperature in degrees Celsius at observation time."
+
+      - name: humidity
+        description: "Relative humidity percentage (0–100)."
+
+      - name: rain_1h_mm
+        description: "Rain volume for the last 1 hour in millimeters."
+
+      - name: rain_3h_mm
+        description: "Rain volume for the last 3 hours in millimeters."
+
+      - name: wind_speed_ms
+        description: "Wind speed in meters per second."
+
+      - name: wind_deg
+        description: "Wind direction in meteorological degrees (0–360)."
+
+      - name: wind_gust_ms
+        description: "Wind gust speed in meters per second."
+
+      - name: event_time
+        description: "Timestamp when the weather observation was recorded by the meteorological source."
+        tests: [not_null]
+
+      - name: api_call_time
+        description: "Timestamp when the API call was executed and data was ingested into the system."
+
+      - name: event_hour
+        description: "Truncated event_time to the nearest hour, used for hourly aggregation and partitioning."
+
+  - name: stg_openweather_current_dedup
+    description: "Deduplicated weather observations keeping the latest ingested record per (country, city, event_time)."
+    columns:
+
+      - name: city
+        description: "City name of the observation."
+
+      - name: country
+        description: "Country code of the observation."
+
+      - name: event_time
+        description: "Original observation timestamp."
+
+      - name: api_call_time
+        description: "Latest ingestion timestamp used to resolve duplicates."
+
+      - name: event_hour
+        description: "Hour-level timestamp derived from event_time."
+
+      - name: temp_c
+        description: "Observed temperature in Celsius."
+
+      - name: humidity
+        description: "Observed humidity percentage."
+
+      - name: rain_1h_mm
+        description: "Rainfall volume in mm during the last hour."
+
+      - name: rain_3h_mm
+        description: "Rainfall volume in mm during the last 3 hours."
+
+      - name: wind_speed_ms
+        description: "Wind speed in m/s."
+
+      - name: wind_deg
+        description: "Wind direction in degrees."
+
+      - name: wind_gust_ms
+        description: "Wind gust speed in m/s."
