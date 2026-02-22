@@ -5,10 +5,26 @@ terraform/*.tfstate.*
 terraform/terraform.tfvars
 terraform/crash.log
 .terraform.lock.hcl
+terraform.tfstate
 
 # Secrets
-.env
+.env.*
 keys/
 *.json
 
 test.py
+__pycache__/
+__init__.py
+
+venv/
+
+#dbt
+target/
+dbt_packages/
+logs/
+.user.yml
+*.parquet
+
+
+note.txt
+
