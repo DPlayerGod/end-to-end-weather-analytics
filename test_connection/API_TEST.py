@@ -3,7 +3,7 @@ from datetime import datetime
 
 # 1. Configuration
 # Replace with your actual API Key from KV Store for local testing
-API_KEY = "ef7ae48bee7aac32425d4100b4a1bfc9" 
+API_KEY = "ef7ae48bee7aac324xxxx1bfc9" 
 CITY = "Hanoi"
 URL = f"http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={API_KEY}&units=metric"
 
