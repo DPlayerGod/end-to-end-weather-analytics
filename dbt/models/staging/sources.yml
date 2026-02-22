@@ -7,4 +7,6 @@ sources:
     tables:
       - name: openweather_current
         description: "Raw OpenWeather current data"
-        loaded_at_field: api_call_time
+        
+        config:
+          loaded_at_field: api_call_time
