@@ -1,15 +1,109 @@
 # end-to-end-weather-analytics
 
-## Problem Statement
-Weather conditions in Southeast Asia change rapidly and influence transportation, logistics, and daily decision-making. However, real-time weather data from public APIs is often unstructured and not analytics-ready. This project addresses the challenge of designing a **reproducible, cloud-based data pipeline** that ingests near real-time weather data, stores it in a scalable architecture, and transforms it into structured datasets suitable for analytical and visualization purposes.
+## 📌 Problem Statement
 
-## Project Overview
-This project implements an end-to-end data engineering pipeline on **Google Cloud** following the **Medallion Architecture** (Bronze–Silver–Gold) pattern. 
+Weather conditions in Southeast Asia change rapidly and influence transportation, logistics, and operational decision-making. However, public weather APIs typically return semi-structured JSON data that is not analytics-ready.
 
-* **Bronze (Raw):** Near real-time weather data is ingested via **Kafka** and processed by **Spark Streaming**, then stored in **Google Cloud Storage (GCS)** as raw JSON files to preserve source fidelity.
+Organizations need a scalable and reproducible data pipeline that can:
 
-* **Silver (Standardized):** Data is cleaned, type-cast, and deduplicated in **BigQuery** using **dbt**, creating a reliable source of truth.
+- Automatically collect near real-time weather data  
+- Preserve raw data for traceability and reprocessing  
+- Transform semi-structured data into structured, analytics-ready tables  
+- Support efficient querying for dashboards and reporting  
 
-* **Gold (Analytics):** Business-ready datasets (e.g., Heat Index calculations, daily aggregations) are generated for high-performance querying and dashboarding.
+This project addresses these challenges by designing a modern, cloud-native ELT pipeline on Google Cloud Platform.
 
-The entire infrastructure is provisioned using **Terraform**, ensuring the project is fully reproducible across any environment.
+---
+
+## 🏗 Project Architecture
+
+![Project Architecture](images/ProjectArchitecture.png)
+
+This project implements an end-to-end data engineering pipeline orchestrated by **Kestra** and deployed on **Google Cloud Platform (GCP)**.
+
+### 🔄 Workflow Orchestration (Kestra)
+
+Kestra schedules and manages all workflows:
+
+- **Every 5 minutes**
+  - Calls the OpenWeather API  
+  - Stores raw JSON data in Google Cloud Storage (GCS)  
+  - Loads data into BigQuery Bronze tables  
+
+- **Every hour**
+  - Triggers `dbt build`  
+  - Updates Silver (staging) and Gold (marts) layers  
+
+This separation ensures near real-time ingestion while keeping transformations cost-efficient and controlled.
+
+---
+
+## 🏅 Medallion Architecture (Bronze–Silver–Gold)
+
+![Medallion Architecture](images/MedallionArchitecture.png)
+
+The project follows the **Medallion Architecture** and modern **ELT principles**, where transformations are executed inside BigQuery using dbt.
+
+### 🥉 Bronze Layer (Raw)
+
+- Stores raw, append-only data loaded from GCS  
+- Preserves original structure for auditability and reprocessing  
+- Declared as `sources` in dbt  
+- No transformation applied  
+
+---
+
+### 🥈 Silver Layer (Standardized)
+
+Using dbt staging models:
+
+- Enforces schema and data types  
+- Handles null values  
+- Deduplicates records  
+- Standardizes column naming  
+- Creates derived fields (e.g., hourly timestamps)  
+
+This layer provides clean, structured datasets.
+
+---
+
+### 🥇 Gold Layer (Analytics)
+
+Using dbt marts:
+
+- Builds Fact and Dimension tables  
+- Applies business logic (e.g., Heat Index classification)  
+- Computes aggregated metrics (e.g., hourly averages)  
+- Optimized using partitioning and clustering  
+
+This layer is directly consumed by BI tools.
+
+---
+
+## 📊 Visualization
+
+**Looker Studio** connects to Gold tables in BigQuery to provide dashboards showing:
+
+- Current weather conditions  
+- Heat risk levels  
+- Hourly temperature trends  
+
+---
+
+## 🏗 Infrastructure as Code
+
+All resources (GCS buckets, BigQuery datasets, service accounts) are provisioned using **Terraform**, ensuring:
+
+- Full reproducibility  
+- Version-controlled infrastructure  
+- Consistent environments  
+
+---
+
+## 🛠 Tech Stack
+
+- **Orchestration:** Kestra  
+- **Cloud:** Google Cloud Platform (GCS, BigQuery)  
+- **Transformation:** dbt  
+- **Infrastructure:** Terraform  
+- **Visualization:** Looker Studio  
