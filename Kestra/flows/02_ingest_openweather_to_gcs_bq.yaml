@@ -1,0 +1,174 @@
+id: 02_ingest_openweather_to_gcs_bq
+namespace: zoomcamp
+description: "OpenWeather SEA cities every 5 min -> GCS raw (year/month/day NDJSON) -> BigQuery raw (append). Includes wind metrics."
+
+triggers:
+  - id: every_5_min
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "*/5 * * * *"
+
+variables:
+  sea_cities:
+    - { name: "Ho Chi Minh City", country: "VN" }
+    - { name: "Hanoi", country: "VN" }
+    - { name: "Bangkok", country: "TH" }
+    - { name: "Singapore", country: "SG" }
+    - { name: "Kuala Lumpur", country: "MY" }
+    - { name: "Jakarta", country: "ID" }
+    - { name: "Manila", country: "PH" }
+    - { name: "Phnom Penh", country: "KH" }
+    - { name: "Vientiane", country: "LA" }
+    - { name: "Yangon", country: "MM" }
+    - { name: "Bandar Seri Begawan", country: "BN" }
+    - { name: "Dili", country: "TL" }
+
+tasks:
+  - id: ingest_to_gcs_and_bq
+    type: io.kestra.plugin.docker.Run
+    containerImage: python:3.11-slim
+    pullPolicy: IF_NOT_PRESENT
+
+    env:
+      GCP_PROJECT_ID: "{{ kv('GCP_PROJECT_ID') }}"
+      GCP_BUCKET_NAME: "{{ kv('GCP_BUCKET_NAME') }}"
+      GCP_DATASET_RAW: "{{ kv('GCP_DATASET_RAW') }}"
+      GCP_CREDS_JSON: "{{ kv('GCP_CREDS') }}"
+      OPENWEATHER_API_KEY: "{{ kv('OPENWEATHER_API_KEY') }}"
+      SEA_CITIES_JSON: "{{ render(vars.sea_cities) | json }}"
+      BQ_TABLE: "openweather_current"
+
+    commands:
+      - bash
+      - -lc
+      - |
+          set -euxo pipefail
+          pwd
+          ls -la
+          pip -q install --no-cache-dir requests google-cloud-storage google-cloud-bigquery
+          python main.py
+
+    inputFiles:
+      main.py: |
+        import os, json, time, datetime
+        import requests
+        from google.cloud import storage, bigquery
+        from google.oauth2 import service_account
+
+        def utc_now_iso_no_micro():
+            return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat()
+
+        def ensure_table_exists(bq: bigquery.Client, table_id: str):
+            try:
+                bq.get_table(table_id)
+                return
+            except Exception:
+                pass
+
+            schema = [
+                bigquery.SchemaField("city", "STRING"),
+                bigquery.SchemaField("country", "STRING"),
+                bigquery.SchemaField("lon", "FLOAT"),
+                bigquery.SchemaField("lat", "FLOAT"),
+                bigquery.SchemaField("temp_c", "FLOAT"),
+                bigquery.SchemaField("humidity", "INTEGER"),
+                bigquery.SchemaField("rain_1h_mm", "FLOAT"),
+                bigquery.SchemaField("rain_3h_mm", "FLOAT"),
+                bigquery.SchemaField("wind_speed_ms", "FLOAT"),
+                bigquery.SchemaField("wind_deg", "FLOAT"),
+                bigquery.SchemaField("wind_gust_ms", "FLOAT"),
+                bigquery.SchemaField("event_time", "TIMESTAMP"),
+                bigquery.SchemaField("api_call_time", "TIMESTAMP"),
+            ]
+
+            table = bigquery.Table(table_id, schema=schema)
+            table.time_partitioning = bigquery.TimePartitioning(
+                type_=bigquery.TimePartitioningType.DAY,
+                field="event_time",
+            )
+            bq.create_table(table)
+
+        def main():
+            project_id = os.environ["GCP_PROJECT_ID"]
+            bucket_name = os.environ["GCP_BUCKET_NAME"]
+            dataset_raw = os.environ["GCP_DATASET_RAW"]
+            table_name = os.environ.get("BQ_TABLE", "openweather_current")
+            api_key = os.environ["OPENWEATHER_API_KEY"]
+            cities = json.loads(os.environ["SEA_CITIES_JSON"])
+
+            creds_info = json.loads(os.environ["GCP_CREDS_JSON"])
+            creds = service_account.Credentials.from_service_account_info(creds_info)
+
+            storage_client = storage.Client(project=project_id, credentials=creds)
+            bq_client = bigquery.Client(project=project_id, credentials=creds)
+
+            api_call_time = utc_now_iso_no_micro()
+
+            rows = []
+            for c in cities:
+                q = f"{c['name']},{c['country']}"
+                url = "https://api.openweathermap.org/data/2.5/weather"
+                params = {"q": q, "appid": api_key, "units": "metric"}
+
+                try:
+                    r = requests.get(url, params=params, timeout=20)
+                    r.raise_for_status()
+                except Exception as e:
+                    print(f"[WARN] request failed for {q}: {e}")
+                    continue
+
+                data = r.json()
+
+                rows.append({
+                    "city": c["name"],
+                    "country": c["country"],
+                    "lon": data.get("coord", {}).get("lon"),
+                    "lat": data.get("coord", {}).get("lat"),
+                    "temp_c": data.get("main", {}).get("temp"),
+                    "humidity": data.get("main", {}).get("humidity"),
+                    "wind_speed_ms": data.get("wind", {}).get("speed"),
+                    "wind_deg": data.get("wind", {}).get("deg"),
+                    "wind_gust_ms": data.get("wind", {}).get("gust"),
+                    "event_time": datetime.datetime.fromtimestamp(
+                        data.get("dt"),
+                        tz=datetime.timezone.utc
+                    ).isoformat(),
+                    "api_call_time": api_call_time,
+                })
+
+                time.sleep(0.2)
+
+            if not rows:
+                raise RuntimeError("No rows fetched from OpenWeather.")
+
+            yyyy, mm, dd = datetime.datetime.now(datetime.timezone.utc).strftime("%Y %m %d").split()
+
+            ts_tag = api_call_time.replace(":", "").replace("-", "").replace("+00:00", "")
+            local_path = f"/tmp/weather_{ts_tag}.jsonl"
+
+            with open(local_path, "w", encoding="utf-8") as f:
+                for row in rows:
+                    f.write(json.dumps(row) + "\n")
+
+            gcs_path = f"raw/openweather_current/year={yyyy}/month={mm}/day={dd}/weather_{ts_tag}.jsonl"
+
+            bucket = storage_client.bucket(bucket_name)
+            blob = bucket.blob(gcs_path)
+            blob.upload_from_filename(local_path)
+
+            gcs_uri = f"gs://{bucket_name}/{gcs_path}"
+
+            table_id = f"{project_id}.{dataset_raw}.{table_name}"
+            ensure_table_exists(bq_client, table_id)
+
+            job_config = bigquery.LoadJobConfig(
+                source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON,
+                write_disposition=bigquery.WriteDisposition.WRITE_APPEND,
+            )
+
+            job = bq_client.load_table_from_uri(gcs_uri, table_id, job_config=job_config)
+            job.result()
+
+            print("[OK] Pipeline completed successfully")
+
+        if __name__ == "__main__":
+            main()

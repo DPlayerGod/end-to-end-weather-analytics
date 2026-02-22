@@ -1,0 +1,53 @@
+id: 03_dbt_build_hourly
+namespace: zoomcamp
+
+description: "Hourly dbt fresh run: deps -> build (prod) for end-to-end-weather-analytics"
+
+triggers:
+  - id: every_hour
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 * * * *"   
+
+tasks:
+  - id: dbt_workspace
+    type: io.kestra.plugin.core.flow.WorkingDirectory
+    tasks:
+      # 1. Clone source code from Github to Working Directory
+      - id: clone_repo
+        type: io.kestra.plugin.git.Clone
+        url: https://github.com/DPlayerGod/end-to-end-weather-analytics
+        branch: main
+      
+        retry:
+          type: constant
+          interval: PT10S
+          maxAttempt: 5
+
+      # 2. Run dbt 
+      - id: dbt_build
+        type: io.kestra.plugin.dbt.cli.DbtCLI
+        
+        containerImage: ghcr.io/kestra-io/dbt-bigquery:latest
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+        # ===============================
+
+        inputFiles:
+          .dbt/profiles.yml: |
+            weather_project:
+              target: prod
+              outputs:
+                prod:
+                  type: bigquery
+                  method: service-account
+                  project: kestra-486406
+                  dataset: weather_raw
+                  location: asia-southeast1
+                  threads: 4
+                  timeout_seconds: 300
+                  keyfile: sa.json
+          sa.json: "{{ kv('GCP_CREDS') }}"
+
+        commands:
+          - dbt deps --project-dir dbt --profiles-dir .dbt
+          - dbt build --project-dir dbt --profiles-dir .dbt

@@ -1,0 +1,40 @@
+id: 01_gcp_kv
+namespace: zoomcamp
+
+tasks:
+  - id: gcp_project_id
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_PROJECT_ID
+    kvType: STRING
+    value: kestra-486406 # TODO replace with your project id
+
+  - id: gcp_location
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_LOCATION
+    kvType: STRING
+    value: asia-southeast1
+
+  - id: gcp_bucket_name
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_BUCKET_NAME
+    kvType: STRING
+    value: cuong-weather-datalake-f5aa3a # TODO make sure it's globally unique!
+
+  - id: gcp_dataset_raw
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_DATASET_RAW
+    kvType: STRING
+    value: weather_raw
+
+  - id: gcp_dataset_staging
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_DATASET_STAGING
+    kvType: STRING
+    value: weather_staging
+
+  - id: gcp_dataset_marts
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_DATASET_MARTS
+    kvType: STRING
+    value: weather_marts
+
