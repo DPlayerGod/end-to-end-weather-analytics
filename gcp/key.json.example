@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "XXX",
+  "private_key_id": "XXXXX",
+  "private_key": "zMlS2b830juGzizbU+9ngq1xj/K\n9rjmMrTAPTfUBTKomToXQLdmUd3kCZSOqA2vCpn4dgN6jv4C2W3MtTwDuA3M/Tz9\nZfCfPc3UkXOsyuz0OamV3fIF2sGcYNWNyzVUCa9LpjSjr99vFAgQ3NCTMJFj3sDE\nid1xCGfFAgMBAAECggEACVY+GeA8Tx4+28tdP3FqgF4xPQQXur2TnKA+fO6PDpb8\nIziP/170gD8MhNWAEB982g2Yhlw/qa/tvq9lLh/wYKZuBbXX0pKvrtNwWD0FOanR\nCwSFNeOBZw9ycVkH6uMzsHLchYQqWjGHB6FXiQ5FaxoELNpAx9bvt2g6GQbTEnju\nETw61p/U3qhy+jrOwhuliR5mUvCNYrrt5C2W2ut9VfRJz+SGbsIpqtnlO57B4yCi\ntXl31nscBETZPecVcFBS1B/XX4VO0vzxOThKHdeWrLVb2PrFTgXaJRpDm+h/ZlJi\n6BEkoaxxAw5WV3wUoOitoFwdUIercyabPGutRCeHMQKBgQD+XbdR1SKWEkLQPd+0\nQlj2NHckppaNXy1kXTr/XrJ7L55PqYMXlLWz8/T4AY4hCBEvRBZP/BD2RF9i9UrL\nu3gX/MLZqVpgBUp3jer7q8kwPC8sbyT+5VCjzuZiouL/W42A2+maJXb8RVC+qyNm\nvwD2CgDh02pCYA/QDR31wOUDKQKBgQDOEhRGqk70Jn6IjcLj9UPEl+UKd3O89fGX\nnkMnLO1LC3Lwi56lZaUKRRWEPizCIyc5S2knSBLo7bUZquMG22yLcOP+RORlKAt/\npm5g6pJsqC+E2G3BGoEDz5V1lnD8j7z/FHlA0xSA9KhY52xLt19Oaj+2q9Eaj/0q\nG4ZQzzVPPQKBgBJunhMa+7eeOSM36Jb6W9HzeVK5k51I8VQdgWHx7cMJb1JceThj\nOUuB+RVjn3X7TKt9JpTDMkN2LudP2QysWAZ89W2qXPcqSvwg149HInwRUGXK5AZo\nfZBxNLafEQ3qB3X3+ZSG9HlRWImIgzc1zg8GKIw0srV+moa7/JjLUo0JAoGAIU08\np5rYPY6G/kxihXJabEfbxNA/DPd1/nmeApO5GVqVTZhSoAoIHNvDOWbO1uTVbuXn\n7WgxXiEkFizOmYoWRYaN4caCXnKVQSDFT7Y4yYR4gXB0dDNzTAlc7u7L/ZTBBzvo\nyHgUJS7kkdF8Z9QPe92hxESJ+0/vqsFd+Gs0A0UCgYAkSTb16aYJYzZkSbfI9S7A\nJuo2AOpIxz1SCdEXeSNmq4DTcCtAWqb3yf9JDVOc3ABLJeYOffI5wWs+v0SM9M5V\nQGAGPZbt4o4wzIfZ7kKAAsPZezVu3VeBOAPGZKW9dAjTdrn024smgMkVp9gwr4Py\nPEfaYSeIfTISH3l0C/gFzA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "cuong-zoomcamp@kestra-486406.iam.gserviceaccount.com",
+  "client_id": "XXXX",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cuong-zoomcamp%40kestra-486406.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
