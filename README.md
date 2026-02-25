@@ -44,42 +44,6 @@ This separation ensures near real-time ingestion while keeping transformations c
 
 The project follows the **Medallion Architecture** and modern **ELT principles**, where transformations are executed inside BigQuery using dbt.
 
-### 🥉 Bronze Layer (Raw)
-
-- Stores raw, append-only data loaded from GCS  
-- Preserves original structure for auditability and reprocessing  
-- Declared as `sources` in dbt  
-- No transformation applied  
-
----
-
-### 🥈 Silver Layer (Standardized)
-
-Using dbt staging models:
-
-- Enforces schema and data types  
-- Handles null values  
-- Deduplicates records  
-- Standardizes column naming  
-- Creates derived fields (e.g., hourly timestamps)  
-
-This layer provides clean, structured datasets.
-
----
-
-### 🥇 Gold Layer (Analytics)
-
-Using dbt marts:
-
-- Builds Fact and Dimension tables  
-- Applies business logic (e.g., Heat Index classification)  
-- Computes aggregated metrics (e.g., hourly averages)  
-- Optimized using partitioning and clustering  
-
-This layer is directly consumed by BI tools.
-
----
-
 ## 📊 Visualization
 
 **Looker Studio** connects to Gold tables in BigQuery to provide dashboards showing:
