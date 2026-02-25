@@ -30,20 +30,29 @@ This project addresses these challenges by designing a modern, cloud-native ELT 
 
 This project implements an end-to-end data engineering pipeline orchestrated by **Kestra** and deployed on **Google Cloud Platform (GCP)**.
 
+## 🏗 Infrastructure as Code
+
+All resources (GCS buckets, BigQuery datasets, service accounts) are provisioned using **Terraform**, ensuring:
+
+- Full reproducibility  
+- Version-controlled infrastructure  
+- Consistent environments  
+
+---
+
 ### 🔄 Workflow Orchestration (Kestra)
 
 Kestra schedules and manages all workflows:
 
 - **Every 5 minutes**
+  - Triggers `Kestra/flows/02_ingest_openweather_to_gcs_bq.yaml`
   - Calls the OpenWeather API  
   - Stores raw JSON data in Google Cloud Storage (GCS)  
   - Loads data into BigQuery Bronze tables  
 
 - **Every hour**
-  - Triggers `dbt build`  
+  - Triggers `Kestra/flows/03_dbt_build_hourly.yaml`  
   - Updates Silver (staging) and Gold (marts) layers  
-
-This separation ensures near real-time ingestion while keeping transformations cost-efficient and controlled.
 
 ---
 
@@ -57,7 +66,7 @@ The project follows the **Medallion Architecture** and modern **ELT principles**
 
 **Looker Studio** connects to Gold tables in BigQuery to provide dashboards showing:
 
-- Current weather conditions  
+- Lastest weather conditions  
 - Heat risk levels  
 - Hourly temperature trends  
 
