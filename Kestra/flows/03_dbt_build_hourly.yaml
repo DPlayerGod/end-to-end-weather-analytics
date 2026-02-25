@@ -40,8 +40,8 @@ tasks:
                 prod:
                   type: bigquery
                   method: service-account
-                  project: kestra-486406
-                  dataset: weather_raw
+                  project: "{{ kv('GCP_PROJECT_ID') }}"
+                  dataset: "{{ kv('GCP_DATASET_RAW') }}"
                   location: asia-southeast1
                   threads: 4
                   timeout_seconds: 300

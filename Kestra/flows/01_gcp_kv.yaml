@@ -18,7 +18,7 @@ tasks:
     type: io.kestra.plugin.core.kv.Set
     key: GCP_BUCKET_NAME
     kvType: STRING
-    value: cuong-weather-datalake-f5aa3a # TODO make sure it's globally unique!
+    value: cuong-weather-datalake-f5aa3a # TODO replace with your bucket name
 
   - id: gcp_dataset_raw
     type: io.kestra.plugin.core.kv.Set
