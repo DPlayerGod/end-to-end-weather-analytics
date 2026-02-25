@@ -52,14 +52,17 @@ resource "google_storage_bucket_object" "logs_prefix" {
 resource "google_bigquery_dataset" "raw" {
   dataset_id = var.raw_dataset_id
   location   = lower(var.location) == "asia-southeast1" ? "asia-southeast1" : var.location
+  delete_contents_on_destroy = true
 }
 
 resource "google_bigquery_dataset" "staging" {
   dataset_id = var.staging_dataset_id
   location   = lower(var.location) == "asia-southeast1" ? "asia-southeast1" : var.location
+  delete_contents_on_destroy = true
 }
 
 resource "google_bigquery_dataset" "marts" {
   dataset_id = var.marts_dataset_id
   location   = lower(var.location) == "asia-southeast1" ? "asia-southeast1" : var.location
+  delete_contents_on_destroy = true
 }
