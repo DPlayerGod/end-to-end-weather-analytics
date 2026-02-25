@@ -15,6 +15,15 @@ This project addresses these challenges by designing a modern, cloud-native ELT 
 
 ---
 
+## 🛠 Tech Stack
+
+- **Orchestration:** Kestra  
+- **Containerization:** Docker & Docker Compose (local development & service orchestration)  
+- **Cloud:** Google Cloud Platform (GCS, BigQuery)  
+- **Transformation:** dbt (BigQuery adapter)  
+- **Infrastructure as Code:** Terraform  
+- **Visualization:** Looker Studio  
+
 ## 🏗 Project Architecture
 
 ![Project Architecture](images/ProjectArchitecture.png)
@@ -63,11 +72,3 @@ All resources (GCS buckets, BigQuery datasets, service accounts) are provisioned
 - Consistent environments  
 
 ---
-
-## 🛠 Tech Stack
-
-- **Orchestration:** Kestra  
-- **Cloud:** Google Cloud Platform (GCS, BigQuery)  
-- **Transformation:** dbt  
-- **Infrastructure:** Terraform  
-- **Visualization:** Looker Studio  
